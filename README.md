@@ -35,54 +35,95 @@ android使用websocket进行长链接的一个简单的demo，该项目适合嵌
         
         
         心跳，2个任务 保持长连接，并检测连接是否正常，不正常或者断网（断网分3种，一种断网未断开，一种已经网和连接断开，另外一种 网未断，连接段）
+        
         
               if (Const.ACTION_START_HEART.equals(action)) {
+              
               //启动心跳
+              
                 if(webSocketConnection==null||!webSocketConnection.isConnected()){
+                
                     Log.e("HeartReceiver","onReceive webSocketConnect initPendingIntent");
+                    
                     //初次心跳检测连接是否存在，不存在或未连接 
+                    
                     if (webSocketConnection != null) {
+                    
                         try {
+                        
                             webSocketConnection.disconnect();//如果存在连接对象 连接不上 则取消连接
+                            
                         }catch (IllegalStateException e){
+                        
                         }
+                        
                     }
+                    
                     webSocketConnect();//初始化连接 并连接
+                    
                 }
+                
                 initPendingIntent();//初始化心跳
+                
 
             } else if (ACTION_HEARTBEAT.equals(action)) {
+            
                 //在此完成心跳需要完成的工作，比如请求远程服务器……
+                
                 ConnectivityManager systemService = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+                
                 NetworkInfo networkInfo = systemService.getActiveNetworkInfo();
+                
                 if (networkInfo == null || !networkInfo.isAvailable()) {//检测网络
+                
                 //第一种情况
+                
                 } else {
+                
                   if (webSocketConnection==null||!webSocketConnection.isConnected()) 
+                  
                         if (webSocketConnection != null) { //第二种情况
+                        
                             webSocketConnection.disconnect();
+                            
                         }
+                        
                         webSocketConnect();
+                        
                     }else {
+                    
                         context.sendBroadcast(messageIntent);
+                        
                         webSocketConnection.sendTextMessage("心跳开始___心跳次数为:"+count++);
+                        
                     }
+                    
 
                 }
+                
             } else if (Const.ACTION_STOP_HEART.equals(action)) {
+            
             
              //停止心跳 ，节省电量
              
              
                 Log.d(TAG, "Stop heart");
+                
                 try{
+                
                     AlarmManager    mAlarmManager = (AlarmManager)applicationContext. getSystemService(ALARM_SERVICE);
+                    
                     mAlarmManager.cancel(mPendingIntent);
+                    
 
                 }catch (Exception e){}
+                
                 mPendingIntent=null;
+                
 
             }
+            
         }
+        
 
 ``
